@@ -22,6 +22,8 @@ import { playbackManager } from '../playback/playbackmanager';
 import { pluginManager } from '../pluginManager';
 import { appRouter } from '../router/appRouter';
 
+import { renderPlaylistShares } from './playlistShares';
+
 import 'elements/emby-button/emby-button';
 import 'elements/emby-input/emby-input';
 import 'elements/emby-button/paper-icon-button-light';
@@ -295,6 +297,11 @@ function getEditorHtml(items: string[], options: PlaylistEditorOptions) {
         </div>
     </div>`;
 
+    if (options.id) {
+        // Read-only list of users the playlist is shared with, filled in by initEditor
+        html += '<div class="playlistSharesSection verticalSection hide"></div>';
+    }
+
     // newPlaylistInfo
     html += '</div>';
 
@@ -368,6 +375,11 @@ function initEditor(content: DialogElement, options: PlaylistEditorOptions, item
             .catch(err => {
                 console.error('[playlistEditor] failed to get playlist details', err);
             });
+
+        const sharesSection = panel.querySelector<HTMLElement>('.playlistSharesSection');
+        if (sharesSection) {
+            void renderPlaylistShares(api, options.id, sharesSection);
+        }
     } else {
         content.querySelector('.fldSelectPlaylist')?.classList.add('hide');
 
